@@ -144,3 +144,5 @@ require (
 )
 
 replace golang.org/x/exp v0.0.0-20231006140011-7918f672742d => golang.org/x/exp v0.0.0-20230713183714-613f0c0eb8a1
+
+replace github.com/open-policy-agent/opa => github.com/open-policy-agent/opa v0.43.1

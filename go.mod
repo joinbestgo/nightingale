@@ -143,6 +143,13 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-replace golang.org/x/exp v0.0.0-20231006140011-7918f672742d => golang.org/x/exp v0.0.0-20230713183714-613f0c0eb8a1
-
-replace github.com/open-policy-agent/opa => github.com/open-policy-agent/opa v0.43.1
+replace (
+	github.com/coreos/etcd => github.com/coreos/etcd/v3 v3.5.18
+	github.com/coreos/go-etcd => github.com/coreos/go-etcd/v3 v3.5.18
+	github.com/emicklei/go-restful => github.com/emicklei/go-restful/v3 v3.12.1
+	github.com/jackc/pgproto3 => github.com/jackc/pgproto3/v2 v2.3.3
+	github.com/open-policy-agent/opa => github.com/open-policy-agent/opa v0.43.1
+	github.com/opencontainers/runc => github.com/opencontainers/runc v1.2.4
+	go.opentelemetry.io/contrib => go.opentelemetry.io/contrib v1.34.0
+	golang.org/x/exp v0.0.0-20231006140011-7918f672742d => golang.org/x/exp v0.0.0-20230713183714-613f0c0eb8a1
+)

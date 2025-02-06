@@ -74,7 +74,7 @@ require (
 	github.com/alicebob/gopher-json v0.0.0-20200520072559-a9ecdc9d1d3a // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/glebarez/go-sqlite v1.21.2 // indirect
-	github.com/jackc/pgx/v5 v5.7.1 // indirect
+	github.com/jackc/pgx/v5 v5.5.5 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/rogpeppe/go-internal v1.13.1 // indirect
@@ -149,11 +149,10 @@ replace (
 	github.com/coreos/go-etcd => github.com/coreos/go-etcd/v3 v3.5.18
 	github.com/emicklei/go-restful => github.com/emicklei/go-restful/v3 v3.12.1
 	github.com/jackc/pgproto3/v2 => github.com/jackc/pgproto3/v2 v2.3.3
-	github.com/jackc/pgx => github.com/jackc/pgx/v5 v5.7.1
-	github.com/jackc/pgx:v4.17.2 => github.com/jackc/pgx/v5 v5.7.1
+	github.com/jackc/pgx/v4 => github.com/jackc/pgx/v5 v5.7.1
 	github.com/open-policy-agent/opa => github.com/open-policy-agent/opa v0.43.1
 	github.com/opencontainers/runc => github.com/opencontainers/runc v1.2.4
 	go.opentelemetry.io/contrib => go.opentelemetry.io/contrib v1.34.0
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d => golang.org/x/exp v0.0.0-20230713183714-613f0c0eb8a1
-	k8s.io/Kubernetes:v1.13.0-alpha.0 => k8s.io/kubernetes v1.28.3
+	k8s.io/kubernetes v1.13.0-alpha.0 => k8s.io/kubernetes v1.28.3
 )

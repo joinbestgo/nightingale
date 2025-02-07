@@ -1,6 +1,8 @@
 module github.com/ccfos/nightingale/v6
 
-go 1.22
+go 1.22.0
+
+toolchain go1.23.3
 
 require (
 	github.com/BurntSushi/toml v1.4.0
@@ -154,5 +156,5 @@ replace (
 	github.com/opencontainers/runc => github.com/opencontainers/runc v1.2.4
 	go.opentelemetry.io/contrib => go.opentelemetry.io/contrib v1.34.0
 	golang.org/x/exp v0.0.0-20231006140011-7918f672742d => golang.org/x/exp v0.0.0-20230713183714-613f0c0eb8a1
-	k8s.io/kubernetes v1.13.0-alpha.0 => k8s.io/kubernetes v1.28.3
+	k8s.io/kubernetes => k8s.io/kubernetes v1.30.3
 )

@@ -165,7 +165,7 @@ replace (
 	github.com/coreos/go-etcd => github.com/coreos/go-etcd/v3 v3.5.18
 	github.com/emicklei/go-restful => github.com/emicklei/go-restful/v3 v3.12.1
 	github.com/jackc/pgproto3/v2 => github.com/jackc/pgproto3/v2 v2.3.3
-	github.com/jackc/pgx/v4 => github.com/jackc/pgx/v5 v5.7.1
+	//github.com/jackc/pgx/v4 => github.com/jackc/pgx/v5 v5.7.1
 	github.com/open-policy-agent/opa => github.com/open-policy-agent/opa v0.43.1
 	github.com/opencontainers/runc => github.com/opencontainers/runc v1.2.4
 	go.opentelemetry.io/contrib => go.opentelemetry.io/contrib v1.34.0

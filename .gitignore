@@ -67,3 +67,4 @@ queries.active
 n9e.sql
 
 !/datasource
+/Dockerfile

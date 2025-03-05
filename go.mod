@@ -62,6 +62,7 @@ require (
 	github.com/andybalholm/brotli v1.1.0 // indirect
 	github.com/go-faster/city v1.0.1 // indirect
 	github.com/go-faster/errors v0.7.1 // indirect
+	github.com/jackc/pgx/v5 v5.5.5 // indirect
 	github.com/klauspost/compress v1.17.11 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/paulmach/orb v0.11.1 // indirect
@@ -84,7 +85,7 @@ require (
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/go-uuid v1.0.3 // indirect
-	github.com/jackc/pgx/v5 v5.7.1 // indirect
+	//github.com/jackc/pgx/v5 v5.7.1 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/jcmturner/aescts/v2 v2.0.0 // indirect
 	github.com/jcmturner/dnsutils/v2 v2.0.0 // indirect
@@ -165,7 +166,8 @@ replace (
 	github.com/coreos/go-etcd => github.com/coreos/go-etcd/v3 v3.5.18
 	github.com/emicklei/go-restful => github.com/emicklei/go-restful/v3 v3.12.1
 	github.com/jackc/pgproto3/v2 => github.com/jackc/pgproto3/v2 v2.3.3
-	//github.com/jackc/pgx/v4 => github.com/jackc/pgx/v5 v5.7.1
+	github.com/jackc/pgx/v4 v4.17.2 => github.com/jackc/pgx/v5 v5.7.1
+	//github.com/jackc/pgx/v5 v5.7.1 => github.com/jackc/pgx/v5 v5.7.1
 	github.com/open-policy-agent/opa => github.com/open-policy-agent/opa v0.43.1
 	github.com/opencontainers/runc => github.com/opencontainers/runc v1.2.4
 	go.opentelemetry.io/contrib => go.opentelemetry.io/contrib v1.34.0

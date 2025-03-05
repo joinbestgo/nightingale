@@ -24,6 +24,7 @@ import (
 	"github.com/ccfos/nightingale/v6/prom"
 	"github.com/ccfos/nightingale/v6/pushgw/idents"
 	"github.com/ccfos/nightingale/v6/storage"
+	"gorm.io/gorm"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rakyll/statik/fs"
@@ -48,40 +49,41 @@ type Router struct {
 	Sso               *sso.SsoClient
 	UserCache         *memsto.UserCacheType
 	UserGroupCache    *memsto.UserGroupCacheType
+	UserTokenCache    *memsto.UserTokenCacheType
 	Ctx               *ctx.Context
-	HeartbeatHook     HeartbeatHookFunc
-	TargetDeleteHook  models.TargetDeleteHookFunc
+
+	HeartbeatHook       HeartbeatHookFunc
+	TargetDeleteHook    models.TargetDeleteHookFunc
+	AlertRuleModifyHook AlertRuleModifyHookFunc
 }
 
 func New(httpConfig httpx.Config, center cconf.Center, alert aconf.Alert, ibex conf.Ibex,
 	operations cconf.Operation, ds *memsto.DatasourceCacheType, ncc *memsto.NotifyConfigCacheType,
 	pc *prom.PromClientMap, redis storage.Redis,
 	sso *sso.SsoClient, ctx *ctx.Context, metaSet *metas.Set, idents *idents.Set,
-	tc *memsto.TargetCacheType, uc *memsto.UserCacheType, ugc *memsto.UserGroupCacheType) *Router {
+	tc *memsto.TargetCacheType, uc *memsto.UserCacheType, ugc *memsto.UserGroupCacheType, utc *memsto.UserTokenCacheType) *Router {
 	return &Router{
-		HTTP:              httpConfig,
-		Center:            center,
-		Alert:             alert,
-		Ibex:              ibex,
-		Operations:        operations,
-		DatasourceCache:   ds,
-		NotifyConfigCache: ncc,
-		PromClients:       pc,
-		Redis:             redis,
-		MetaSet:           metaSet,
-		IdentSet:          idents,
-		TargetCache:       tc,
-		Sso:               sso,
-		UserCache:         uc,
-		UserGroupCache:    ugc,
-		Ctx:               ctx,
-		HeartbeatHook:     func(ident string) map[string]interface{} { return nil },
-		TargetDeleteHook:  emptyDeleteHook,
+		HTTP:                httpConfig,
+		Center:              center,
+		Alert:               alert,
+		Ibex:                ibex,
+		Operations:          operations,
+		DatasourceCache:     ds,
+		NotifyConfigCache:   ncc,
+		PromClients:         pc,
+		Redis:               redis,
+		MetaSet:             metaSet,
+		IdentSet:            idents,
+		TargetCache:         tc,
+		Sso:                 sso,
+		UserCache:           uc,
+		UserGroupCache:      ugc,
+		UserTokenCache:      utc,
+		Ctx:                 ctx,
+		HeartbeatHook:       func(ident string) map[string]interface{} { return nil },
+		TargetDeleteHook:    func(tx *gorm.DB, idents []string) error { return nil },
+		AlertRuleModifyHook: func(ar *models.AlertRule) {},
 	}
-}
-
-func emptyDeleteHook(ctx *ctx.Context, idents []string) error {
-	return nil
 }
 
 func stat() gin.HandlerFunc {
@@ -258,6 +260,9 @@ func (rt *Router) Config(r *gin.Engine) {
 		pages.GET("/self/profile", rt.auth(), rt.user(), rt.selfProfileGet)
 		pages.PUT("/self/profile", rt.auth(), rt.user(), rt.selfProfilePut)
 		pages.PUT("/self/password", rt.auth(), rt.user(), rt.selfPasswordPut)
+		pages.GET("/self/token", rt.auth(), rt.user(), rt.getToken)
+		pages.POST("/self/token", rt.auth(), rt.user(), rt.addToken)
+		pages.DELETE("/self/token/:id", rt.auth(), rt.user(), rt.deleteToken)
 
 		pages.GET("/users", rt.auth(), rt.user(), rt.perm("/users"), rt.userGets)
 		pages.POST("/users", rt.auth(), rt.admin(), rt.userAddPost)
@@ -507,6 +512,29 @@ func (rt *Router) Config(r *gin.Engine) {
 		pages.DELETE("/builtin-payloads", rt.auth(), rt.user(), rt.perm("/built-in-components/del"), rt.builtinPayloadsDel)
 		pages.GET("/builtin-payload", rt.auth(), rt.user(), rt.builtinPayloadsGetByUUIDOrID)
 
+		pages.POST("/message-templates", rt.auth(), rt.user(), rt.perm("/notification-templates/add"), rt.messageTemplatesAdd)
+		pages.DELETE("/message-templates", rt.auth(), rt.user(), rt.perm("/notification-templates/del"), rt.messageTemplatesDel)
+		pages.PUT("/message-template/:id", rt.auth(), rt.user(), rt.perm("/notification-templates/put"), rt.messageTemplatePut)
+		pages.GET("/message-template/:id", rt.auth(), rt.user(), rt.perm("/notification-templates"), rt.messageTemplateGet)
+		pages.GET("/message-templates", rt.auth(), rt.user(), rt.messageTemplatesGet)
+		pages.POST("/events-message", rt.auth(), rt.user(), rt.eventsMessage)
+
+		pages.POST("/notify-rules", rt.auth(), rt.user(), rt.perm("/notification-rules/add"), rt.notifyRulesAdd)
+		pages.DELETE("/notify-rules", rt.auth(), rt.user(), rt.perm("/notification-rules/del"), rt.notifyRulesDel)
+		pages.PUT("/notify-rule/:id", rt.auth(), rt.user(), rt.perm("/notification-rules/put"), rt.notifyRulePut)
+		pages.GET("/notify-rule/:id", rt.auth(), rt.user(), rt.perm("/notification-rules"), rt.notifyRuleGet)
+		pages.GET("/notify-rules", rt.auth(), rt.user(), rt.perm("/notification-rules"), rt.notifyRulesGet)
+		pages.POST("/notify-rule/test", rt.auth(), rt.user(), rt.perm("/notification-rules"), rt.notifyTest)
+		pages.GET("/notify-rule/custom-params", rt.auth(), rt.user(), rt.perm("/notification-rules"), rt.notifyRuleCustomParamsGet)
+
+		pages.POST("/notify-channel-configs", rt.auth(), rt.user(), rt.perm("/notification-channels/add"), rt.notifyChannelsAdd)
+		pages.DELETE("/notify-channel-configs", rt.auth(), rt.user(), rt.perm("/notification-channels/del"), rt.notifyChannelsDel)
+		pages.PUT("/notify-channel-config/:id", rt.auth(), rt.user(), rt.perm("/notification-channels/put"), rt.notifyChannelPut)
+		pages.GET("/notify-channel-config/:id", rt.auth(), rt.user(), rt.perm("/notification-channels"), rt.notifyChannelGet)
+		pages.GET("/notify-channel-configs", rt.auth(), rt.user(), rt.perm("/notification-channels"), rt.notifyChannelsGet)
+		pages.GET("/simplified-notify-channel-configs", rt.notifyChannelsGetForNormalUser)
+		pages.GET("/flashduty-channel-list/:id", rt.auth(), rt.user(), rt.flashDutyNotifyChannelsGet)
+		pages.GET("/notify-channel-config", rt.auth(), rt.user(), rt.perm("/notification-channels"), rt.notifyChannelGetBy)
 	}
 
 	r.GET("/api/n9e/versions", func(c *gin.Context) {
@@ -606,6 +634,15 @@ func (rt *Router) Config(r *gin.Engine) {
 			service.GET("/alert-cur-events-del-by-hash", rt.alertCurEventDelByHash)
 
 			service.POST("/center/heartbeat", rt.heartbeat)
+
+			service.GET("/es-index-pattern-list", rt.esIndexPatternGetList)
+
+			service.GET("/notify-rules", rt.notifyRulesGetByService)
+
+			service.GET("/notify-channels", rt.notifyChannelConfigGets)
+
+			service.GET("/message-templates", rt.messageTemplateGets)
+
 		}
 	}
 
